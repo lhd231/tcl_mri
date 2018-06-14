@@ -28,14 +28,14 @@ import scipy.io as sio
 
 # Data generation ---------------------------------------------
 random_seed = 0 # random seed
-num_comp = 50 # number of components (dimension)
+num_comp = 200 # number of components (dimension)
 num_subs = 1
-num_segmentdata = 17# number of data-points in each segment
-num_segment = 70 # number of segnents
+num_segmentdata = 32# number of data-points in each segment
+num_segment = 2131 # number of segnents
 num_layer = 5 # number of layers of mixing-MLP
 
 # MLP ---------------------------------------------------------
-list_hidden_nodes = [300, 350, 250, 125, 50]
+list_hidden_nodes = [400, 600, 200, 20]
 # list of the number of nodes of each hidden layer of feature-MLP
 # [layer1, layer2, ..., layer(num_layer)]
 
@@ -43,7 +43,7 @@ list_hidden_nodes = [300, 350, 250, 125, 50]
 initial_learning_rate = 0.001 # initial learning rate
 momentum = 0.9 # momentum parameter of SGD
 max_steps = int(6e5) # number of iterations (mini-batches)
-decay_steps = int(5e5) # decay steps (tf.train.exponential_decay)
+decay_steps = int(4e5) # decay steps (tf.train.exponential_decay)
 decay_factor = 0.1 # decay factor (tf.train.exponential_decay)
 batch_size = 30 # mini-batch size
 moving_average_decay = 0.9999 # moving average decay of variables to be saved
@@ -51,7 +51,7 @@ checkpoint_steps = 1e5 # interval to save checkpoint
 
 # for MLR initialization
 max_steps_init = int(7e4) # number of iterations (mini-batches) for initializing only MLR
-decay_steps_init = int(5e4) # decay steps for initializing only MLR
+decay_steps_init = int(3e4) # decay steps for initializing only MLR
 
 # Other -------------------------------------------------------
 # # Note: save folder must be under ./storage
@@ -123,7 +123,8 @@ img_data = apply_mask(img,mask)
 pca = PCA(n_components=num_comp)
 s = pca.fit_transform(img_data)
 img_shape = img_data.shape
-x=s[5:,:]
+#x=s[5:,:].T
+x=s.T
 raw.append(x)
 print(x.shape)
 
@@ -153,7 +154,7 @@ for i in range(1,num_subs):
 
 '''
 source = x.T
-np.savetxt("total_input.csv",source,delimiter=',')
+#np.savetxt("total_input.csv",source,delimiter=',')
 print("source shape")
 print(source.shape)
 labels = []
