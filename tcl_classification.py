@@ -28,22 +28,22 @@ import scipy.io as sio
 
 # Data generation ---------------------------------------------
 random_seed = 0 # random seed
-num_comp = 200 # number of components (dimension)
+num_comp = 50 # number of components (dimension)
 num_subs = 1
-num_segmentdata = 32# number of data-points in each segment
-num_segment = 2131 # number of segnents
+num_segmentdata = 52# number of data-points in each segment
+num_segment = 490 # number of segnents
 num_layer = 5 # number of layers of mixing-MLP
 
 # MLP ---------------------------------------------------------
-list_hidden_nodes = [400, 600, 200, 20]
+list_hidden_nodes = [300, 350, 250, 125, 20]
 # list of the number of nodes of each hidden layer of feature-MLP
 # [layer1, layer2, ..., layer(num_layer)]
 
 # Training ----------------------------------------------------
-initial_learning_rate = 0.001 # initial learning rate
+initial_learning_rate = 0.0001 # initial learning rate
 momentum = 0.9 # momentum parameter of SGD
 max_steps = int(6e5) # number of iterations (mini-batches)
-decay_steps = int(4e5) # decay steps (tf.train.exponential_decay)
+decay_steps = int(5e5) # decay steps (tf.train.exponential_decay)
 decay_factor = 0.1 # decay factor (tf.train.exponential_decay)
 batch_size = 30 # mini-batch size
 moving_average_decay = 0.9999 # moving average decay of variables to be saved
@@ -51,7 +51,7 @@ checkpoint_steps = 1e5 # interval to save checkpoint
 
 # for MLR initialization
 max_steps_init = int(7e4) # number of iterations (mini-batches) for initializing only MLR
-decay_steps_init = int(3e4) # decay steps for initializing only MLR
+decay_steps_init = int(5e4) # decay steps for initializing only MLR
 
 # Other -------------------------------------------------------
 # # Note: save folder must be under ./storage
@@ -98,9 +98,13 @@ treat each subject as a segment.  So, I think there is a better way to do this, 
 come in :)
 '''
 
-mask = nib.load("/export/mialab/users/nlewis/HCP_ZFU/Fixed_MNI152_T1_3mm_brain_mask.nii.gz")
+mask = nib.load("4m_fbirn_mask.nii")
 #mask = nib.load("/export/mialab/users/nlewis/ica_tf/data/fbirn_unsmoothed/fbirnp3_restMask.nii")
-
+def make_one_hot(target,labels):
+    print(type(target))
+    targets = np.zeros((len(target),labels))
+    targets[np.arange(len(target)),target] = 1
+    return targets
 '''
 Numpy-ness:  Due to numpy arrays, we can't concatenate to an empty array.  So, we initialize the array
 to be the first subject in our list.  You'll notice the for loop is indexed at 1, instead of 0
@@ -117,14 +121,15 @@ pca = PCA(n_components=num_comp)
 s = pca.fit_transform(img_data)
 x=s
 '''
-fil = '/export/mialab/users/nlewis/HCP_ZFU/101410.nii'
+fil = 'resamp_dwa_000300655084_0002.nii'
 img = nib.load(fil)
 img_data = apply_mask(img,mask)
+img_data = img_data[:,11:-11]
+print(img_data.shape)
 pca = PCA(n_components=num_comp)
 s = pca.fit_transform(img_data)
 img_shape = img_data.shape
-#x=s[5:,:].T
-x=s.T
+x=img_data.T
 raw.append(x)
 print(x.shape)
 
@@ -154,19 +159,16 @@ for i in range(1,num_subs):
 
 '''
 source = x.T
-#np.savetxt("total_input.csv",source,delimiter=',')
+np.savetxt("total_input.csv",source,delimiter=',')
 print("source shape")
 print(source.shape)
 labels = []
 for i in range(num_segment):
     labels += [i]*num_segmentdata
 print(len(labels))
-print(source.shape)
-print(num_segment)
-print(max(labels))
-print(labels[-1])
+
 # Preprocessing -----------------------------------------------
-labels = np.array(labels)
+labels = make_one_hot(labels,num_segment)
 
 model_parm = {'random_seed':random_seed,
               'num_comp':num_comp,

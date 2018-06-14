@@ -134,14 +134,17 @@ def loss(logits, labels):
         Loss tensor of type float.
     """
     # Calculate the average cross entropy loss across the batch.
-    labels = tf.cast(labels, tf.int64)
-    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
-        labels=labels, logits=logits, name='cross_entropy_per_example')
-    cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
+    labels_chk = tf.cast(labels, tf.float64)
+    smax = tf.log(tf.nn.softmax(logits) + 1e-10)
+    loss = labels_chk * smax
+    loss = -tf.reduce_sum(loss)
+    #cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
+    #    labels=labels, logits=logits, name='cross_entropy_per_example')
+    cross_entropy_mean = tf.reduce_mean(loss, name='cross_entropy')
     tf.add_to_collection('losses', cross_entropy_mean)
 
     # Calculate accuracy
-    correct_prediction = tf.equal(tf.argmax(logits, 1), labels)
+    correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(labels,1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float64), name='acurracy')
 
     # The total loss is defined as the cross entropy loss plus all of the weight
