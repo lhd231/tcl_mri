@@ -30,8 +30,8 @@ import scipy.io as sio
 random_seed = 0 # random seed
 num_comp = 50 # number of components (dimension)
 num_subs = 1
-num_segmentdata = 52# number of data-points in each segment
-num_segment = 490 # number of segnents
+num_segmentdata = 728# number of data-points in each segment
+num_segment = 35 # number of segnents
 num_layer = 5 # number of layers of mixing-MLP
 
 # MLP ---------------------------------------------------------
@@ -101,9 +101,8 @@ come in :)
 mask = nib.load("4m_fbirn_mask.nii")
 #mask = nib.load("/export/mialab/users/nlewis/ica_tf/data/fbirn_unsmoothed/fbirnp3_restMask.nii")
 def make_one_hot(target,labels):
-    print(type(target))
     targets = np.zeros((len(target),labels))
-    targets[np.arange(len(target)),target] = 1
+    targets[np.arange(len(target)),target-1] = 1
     return targets
 '''
 Numpy-ness:  Due to numpy arrays, we can't concatenate to an empty array.  So, we initialize the array
@@ -163,12 +162,13 @@ np.savetxt("total_input.csv",source,delimiter=',')
 print("source shape")
 print(source.shape)
 labels = []
-for i in range(num_segment):
+for i in range(0,num_segment+1):
     labels += [i]*num_segmentdata
-print(len(labels))
+print(max(labels))
+print(num_segment)
 
 # Preprocessing -----------------------------------------------
-labels = make_one_hot(labels,num_segment)
+labels = np.array(labels)
 
 model_parm = {'random_seed':random_seed,
               'num_comp':num_comp,
