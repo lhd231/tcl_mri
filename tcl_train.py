@@ -11,7 +11,7 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
-import tcl
+import tcl_CNN as tcl
 from subfunc.showdata import *
 
 FLAGS = tf.app.flags.FLAGS
@@ -70,8 +70,8 @@ def train(data,
         global_step = tf.Variable(0, trainable=False)
 
         # Data holder
-        data_holder = tf.placeholder(tf.float64, shape=[None, data.shape[0]], name='data')
-        label_holder = tf.placeholder(tf.int64, shape=[None], name='label')
+        data_holder = tf.placeholder(tf.float32, shape=[None, data.shape[0]], name='data')
+        label_holder = tf.placeholder(tf.int32, shape=[None], name='label')
 
         # Build a Graph that computes the logits predictions from the
         # inference model.
