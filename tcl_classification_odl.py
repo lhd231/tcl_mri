@@ -44,7 +44,7 @@ initial_learning_rate = 0.0001 # initial learning rate
 momentum = 0.9 # momentum parameter of SGD
 max_steps = int(6e5) # number of iterations (mini-batches)
 decay_steps = int(5e5) # decay steps (tf.train.exponential_decay)
-decay_factor = 0.01 # decay factor (tf.train.exponential_decay)
+decay_factor = 0.1 # decay factor (tf.train.exponential_decay)
 batch_size = 50 # mini-batch size
 moving_average_decay = 0.9999 # moving average decay of variables to be saved
 checkpoint_steps = 1e5 # interval to save checkpoint
@@ -98,7 +98,7 @@ treat each subject as a segment.  So, I think there is a better way to do this, 
 come in :)
 '''
 
-mask = nib.load("/export/mialab/users/nlewis/TCL/old/ica_tf/tcl_mri/fbirn_unsmoothed/fbirnp3_restMask.nii")
+mask = nib.load("fbirnp3_restMask.nii")
 #mask = nib.load("/export/mialab/users/nlewis/ica_tf/data/fbirn_unsmoothed/fbirnp3_restMask.nii")
 
 '''
@@ -118,6 +118,7 @@ s = pca.fit_transform(img_data)
 x=s
 '''
 fil = '/export/mialab/users/nlewis/TCL/old/ica_tf/tcl_mri/fbirn_unsmoothed/despikedData/dwa_000306518979_0002.nii'
+fil = 'dwa_000306518979_0002.nii'
 img = nib.load(fil)
 img_data = apply_mask(img,mask)
 pca = PCA(n_components=num_comp)
