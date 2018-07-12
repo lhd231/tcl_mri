@@ -83,7 +83,7 @@ def inference(x, list_hidden_nodes, num_class, wd = 1e-4, maxout_k = 2, MLP_trai
     num_layer = len(list_hidden_nodes)
     kernel_width = 3
     # Hidden layers -------------------------------------------
-    for ln in xrange(num_layer):
+    for ln in range(num_layer):
         stride = [1, 1, 1, 1]
         with tf.variable_scope('layer'+str(ln+1)) as scope:
             in_dim = list_hidden_nodes[ln-1] if ln > 0 else 1
@@ -111,7 +111,8 @@ def inference(x, list_hidden_nodes, num_class, wd = 1e-4, maxout_k = 2, MLP_trai
             # Add summary
             tf.summary.histogram('layer'+str(ln+1)+'/activations', x)
     shp = x.get_shape().as_list()
-    feats = x = tf.layers.dense(tf.reshape(x,[-1,shp[1]*shp[3]]),20)
+    x = tf.layers.max_pooling2d(x,[152,1],strides=[1,1])
+    feats = x = tf.reshape(x,shape=[-1,20])
 
     # MLR -----------------------------------------------------
     with tf.variable_scope('MLR') as scope:
